@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Invoice Extractor</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { display: flex; gap: 20px; justify-content: center; }
+        .box { width: 45%; padding: 10px; border: 1px solid #ccc; min-height: 300px; }
+        img { max-width: 100%; height: auto; }
+        pre { text-align: left; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>OCR Invoice Extractor</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="processImage()">Process Image</button>
+    
+    <div class="container">
+        <div class="box">
+            <h2>Uploaded Image</h2>
+            <img id="uploadedImage" src="" alt="Upload an image" />
+        </div>
+        <div class="box">
+            <h2>Extracted Text</h2>
+            <pre id="extractedText">Waiting for text...</pre>
+        </div>
+    </div>
+
+    <script>
+        function processImage() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            document.getElementById('uploadedImage').src = URL.createObjectURL(file);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('http://127.0.0.1:5000/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('extractedText').textContent = data.extracted_text || 'Error extracting text';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('extractedText').textContent = 'Error processing the image.';
+            });
+        }
+    </script>
+</body>
+</html>
