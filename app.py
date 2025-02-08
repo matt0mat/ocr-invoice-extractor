@@ -1,9 +1,12 @@
-from flask import Flask, request, jsonify
 import pytesseract
+from flask import Flask, request, jsonify
 from PIL import Image
 import io
 
 app = Flask(__name__)
+
+# Inside Docker, Tesseract is in /usr/bin/tesseract
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -19,4 +22,4 @@ def upload_file():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
